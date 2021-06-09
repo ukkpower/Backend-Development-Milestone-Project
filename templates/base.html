@@ -36,19 +36,19 @@
     <header id="header" class="header fixed-top">
         <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
 
-            <a href="index.html" class="logo d-flex align-items-center">
+            <a href="{{url_for('index')}}" class="logo d-flex align-items-center">
                 <img src="{{url_for('static', filename='/assets/img/logo.png')}}" alt="">
                 <span>FlexStart</span>
             </a>
 
             <nav id="navbar" class="navbar">
                 <ul>
-                    <li><a class="nav-link scrollto active" href="#hero">Public Poll</a></li>
-                    <li><a class="nav-link scrollto" href="#about">Create Poll</a></li>
+                    <li><a class="nav-link scrollto active" href="{{url_for('public')}}">Public Poll</a></li>
+                    <li><a class="nav-link scrollto" href="{{url_for('new')}}">Create Poll</a></li>
 
 
-                    <li><a class="nav-link scrollto" href="#contact">Login</a></li>
-                    <li><a class="getstarted scrollto" href="#about">Sign Up</a></li>
+                    <li><a class="nav-link scrollto" href="{{url_for('login')}}">Login</a></li>
+                    <li><a class="getstarted scrollto" href="{{url_for('signup')}}">Sign Up</a></li>
                 </ul>
                 <i class="bi bi-list mobile-nav-toggle"></i>
             </nav><!-- .navbar -->

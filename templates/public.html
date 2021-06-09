@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+
+<main id="public">
+  <section id="signin">
+
+    <div class="container">
+      <div class="row justify-content-center h-100 align-items-center">
+        <div class="col-md-10">
+
+          <h2>Public Polls</h2>
+          <p>Below are the public polls created by Fast Poll members.</p>
+
+          <div class="card mb-3">
+            <div class="card-body">
+              <h2 class="card-title">Card title</h2>
+              <p class="date">Created <time class="timeago" datetime="2021-06-03T16:19:24+0000"
+                  title="3rd June 2021">about 3 hours ago</time></p>
+              <span class="badge rounded-pill bg-success">9 Votes</span>
+            </div>
+          </div>
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">Card title</h5>
+              <p class="card-text">
+                Some quick example text to build on the card title and make up the bulk of the
+                card's content.
+              </p>
+              <button type="button" class="btn btn-primary">Button</button>
+            </div>
+          </div>
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">Card title</h5>
+              <p class="card-text">
+                Some quick example text to build on the card title and make up the bulk of the
+                card's content.
+              </p>
+              <button type="button" class="btn btn-primary">Button</button>
+            </div>
+          </div>
+
+          <nav aria-label="...">
+            <ul class="pagination pagination-lg">
+              <li class="page-item active" aria-current="page">
+                <span class="page-link">1</span>
+              </li>
+              <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item"><a class="page-link" href="#">3</a></li>
+            </ul>
+          </nav>
+
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+{% endblock %}
