@@ -13,21 +13,22 @@
                 <div class="auth-form">
                   <h4 class="mb-4">Sign Up</h4>
                   <p>Complete the below form to create your account</p>
-                  <form class="row g-3">
+
+                  <form class="row g-3" method="POST" action="{{ url_for('signup') }}">
                     <div class="col-md-6">
-                      <input type="text" class="form-control" id="firstName" placeholder="First Name">
+                      <input type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name">
                     </div>
                     <div class="col-md-6">
-                      <input type="text" class="form-control" id="lastName" placeholder="Last Name">
+                      <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name">
                     </div>
                     <div class="col-12">
-                      <input type="email" class="form-control" id="inputEmail" placeholder="Email Address">
+                      <input type="email" class="form-control" id="email" name="email" placeholder="Email Address">
                     </div>
                     <div class="col-12">
-                      <input type="text" class="form-control" id="inputUsername" placeholder="Username">
+                      <input type="text" class="form-control" id="username" name="username" placeholder="Username">
                     </div>
                     <div class="col-12">
-                      <input type="password" class="form-control" id="inputPassword" placeholder="Password">
+                      <input type="password" class="form-control" id="password" name="password" placeholder="Password">
                     </div>
                     <div class="col-12">
                       <div class="form-check">
@@ -41,6 +42,7 @@
                       <button type="submit" class="btn btn-primary w-100">Sign in</button>
                     </div>
                   </form>
+
                   <div class="new-account mt-3 text-center">
                     <p class="">Already have an account? <a class="" href="/react/demo/page-register">Login</a></p>
                   </div>
