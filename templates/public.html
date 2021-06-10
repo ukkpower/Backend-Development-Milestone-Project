@@ -4,6 +4,10 @@
 <main id="public">
   <section id="signin">
 
+    {% for poll in polls %}
+    {{ poll.question }}
+    {% endfor %}
+
     <div class="container">
       <div class="row justify-content-center h-100 align-items-center">
         <div class="col-md-10">
