@@ -7,6 +7,17 @@
     <div class="container">
       <div class="row justify-content-center h-100 align-items-center">
         <div class="col-md-4">
+
+          {% with errors = get_flashed_messages(category_filter=["error"]) %}
+          {% if errors %}
+          <div class="alert alert-danger" role="alert">
+              {%- for msg in errors %}
+                {{ msg }}
+              {% endfor -%}
+          </div>
+          {% endif %}
+          {% endwith %}
+
           <div class="authincation-content">
             <div class="row no-gutters">
               <div class="col-xl-12">

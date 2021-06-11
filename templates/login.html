@@ -7,12 +7,25 @@
     <div class="container">
       <div class="row justify-content-center h-100 align-items-center">
         <div class="col-md-4">
+
+          {% with messages = get_flashed_messages() %}
+          {% if messages %}
+          <div class="alert alert-success" role="alert">
+            {% for message in messages %}
+              {{ message }}
+            {% endfor %}
+          </div>
+          </ul>
+          {% endif %}
+          {% endwith %}
+
           <div class="authincation-content">
             <div class="row no-gutters">
               <div class="col-xl-12">
                 <div class="auth-form">
                   <h4 class="mb-4 text-center">Hey there, welcome back.</h4>
                   <p class="text-center">Login to FlasPoll.io</p>
+
                   <form class="row g-3">
                     <div class="col-12">
                       <label for="inputEmail" class="col-form-label">Email Address</label>
