@@ -47,8 +47,8 @@ def signup():
             {"username": request.form.get("username").lower()})
 
         if existing_user:
-            flash("Username already exists")
-            return redirect(url_for("register"))
+            flash("Username already exists", 'error')
+            return redirect(url_for("signup"))
 
         register = {
             "firstName": request.form.get("firstName"),
@@ -60,8 +60,9 @@ def signup():
         mongo.db.users.insert_one(register)
 
         # put the new user into 'session' cookie
-        session["user"] = request.form.get("username").lower()
-        flash("Registration Successful!")
+        # session["user"] = request.form.get("username").lower()
+        flash("Registration Successful! You can now login")
+        return redirect(url_for('login'))
 
     return render_template("signup.html")
 
