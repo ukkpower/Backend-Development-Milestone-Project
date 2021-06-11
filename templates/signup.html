@@ -16,23 +16,23 @@
 
                   <form class="row g-3" method="POST" action="{{ url_for('signup') }}">
                     <div class="col-md-6">
-                      <input type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name">
+                      <input type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name" required>
                     </div>
                     <div class="col-md-6">
-                      <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name">
+                      <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name" required>
                     </div>
                     <div class="col-12">
-                      <input type="email" class="form-control" id="email" name="email" placeholder="Email Address">
+                      <input type="email" class="form-control" id="email" name="email" placeholder="Email Address" required>
                     </div>
                     <div class="col-12">
-                      <input type="text" class="form-control" id="username" name="username" placeholder="Username">
+                      <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
                     </div>
                     <div class="col-12">
-                      <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                      <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
                     </div>
                     <div class="col-12">
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="gridCheck">
+                        <input class="form-check-input" type="checkbox" id="gridCheck" required>
                         <label class="form-check-label" for="gridCheck">
                           I agree to the terms of use
                         </label>
