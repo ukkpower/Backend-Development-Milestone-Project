@@ -59,7 +59,8 @@ def login():
             if check_password_hash(
                 existing_user["password"], request.form.get("password")):
                     session["user"] = request.form.get("username").lower()
-                    flash("Welcome, {}".format(request.form.get("username")))
+                    # flash("Welcome, {}".format(request.form.get("username")))
+                    return redirect(url_for("dashboard"))
             else:
                 # invalid password match
                 flash("Incorrect Username and/or Password", 'error')
@@ -98,6 +99,19 @@ def signup():
         return redirect(url_for('login'))
 
     return render_template("signup.html", form=form)
+
+
+@app.route("/logout")
+def logout():
+    # remove user from session cookie
+    flash("You have been logged out")
+    session.pop("user")
+    return redirect(url_for("login"))
+
+
+@app.route("/dashboard")
+def dashboard():
+    return render_template("dashboard.html")
 
 
 if __name__ == "__main__":
