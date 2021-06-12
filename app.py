@@ -5,6 +5,7 @@ from flask import (
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
+from forms import RegistrationForm, LoginForm, RecipeForm
 if os.path.exists("env.py"):
     import env
 
@@ -55,7 +56,8 @@ def login():
         else:
             # username doesn't exist
             flash("Incorrect Username and/or Password", 'error')
-            return redirect(url_for("login"))    
+            return redirect(url_for("login"))
+
     return render_template("login.html")
 
 
@@ -79,8 +81,6 @@ def signup():
         }
         mongo.db.users.insert_one(register)
 
-        # put the new user into 'session' cookie
-        # session["user"] = request.form.get("username").lower()
         flash("Registration Successful! You can now login")
         return redirect(url_for('login'))
 

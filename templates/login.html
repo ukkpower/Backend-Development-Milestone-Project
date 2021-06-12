@@ -19,6 +19,16 @@
           {% endif %}
           {% endwith %}
 
+          {% with errors = get_flashed_messages(category_filter=["error"]) %}
+          {% if errors %}
+          <div class="alert alert-danger" role="alert">
+              {%- for msg in errors %}
+                {{ msg }}
+              {% endfor -%}
+          </div>
+          {% endif %}
+          {% endwith %}          
+
           <div class="authincation-content">
             <div class="row no-gutters">
               <div class="col-xl-12">
@@ -28,12 +38,12 @@
 
                   <form class="row g-3">
                     <div class="col-12">
-                      <label for="inputEmail" class="col-form-label">Email Address</label>
-                      <input type="email" class="form-control" id="inputEmail" placeholder="Enter Email Address">
+                      <label for="inputEmail" class="col-form-label">Username</label>
+                      <input type="text" class="form-control" id="username" name="username" placeholder="Enter Username">
                     </div>
                     <div class="col-12">
                       <label for="inputPassword" class="col-form-label">Password</label>
-                      <input type="password" class="form-control" id="inputPassword" placeholder="Enter Password">
+                      <input type="password" class="form-control" id="password" name="password" placeholder="Enter Password">
                     </div>
                     <div class="col-md-6">
                       <div class="form-check">
