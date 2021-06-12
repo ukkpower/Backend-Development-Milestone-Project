@@ -10,24 +10,29 @@
           <h2>Create a poll</h2>
           <p>Complete the below fields to create your poll</p>
 
-          <form>
-
+          <form method="POST" action="{{ url_for('new') }}">
+            {{form.hidden_tag()}}
+            <!-- Poll Question -->
             <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label>
             <div class="form-floating">
-              <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2"
-                style="height: 100px"></textarea>
-              <label for="floatingTextarea2">Comments</label>
+                {{form.pollQuestion(class_="form-control", style="height: 100px")}}
+              <label for="pollQuestion">Comments</label>
             </div>
 
+            <!-- Poll Options -->
+            <div class="mb-3">
+              <label for="exampleFormControlTextarea1" class="form-label">Poll option</label>
+              {{form.pollOption_1(class_="form-control")}}
+            </div>
 
             <div class="mb-3">
               <label for="exampleFormControlTextarea1" class="form-label">Poll option</label>
-              <textarea class="form-control" id="exampleFormControlTextarea1" rows="2"></textarea>
+              {{form.pollOption_2(class_="form-control")}}
             </div>
 
             <div class="mb-3">
               <label for="exampleFormControlTextarea1" class="form-label">Poll option</label>
-              <textarea class="form-control" id="exampleFormControlTextarea1" rows="2"></textarea>
+              {{form.pollOption_3(class_="form-control")}}
             </div>
 
             <button id="addNew" type="button" class="btn btn-primary" onclick="addOption()">Add Another Option</button>
@@ -56,13 +61,15 @@
 </main>
 
 <script>
+  let optionCount = 3;
   function addOption() {
+    optionCount++;
     // Create a new element
     var newNode = document.createElement('div');
     newNode.innerHTML = `<div class="mb-3">
         <label for="exampleFormControlTextarea1" class="form-label">Poll option</label>
-        <textarea class="form-control" id="exampleFormControlTextarea1" rows="2"></textarea>
-      </div>;`
+        <input class="form-control" id="pollOption_${optionCount}">
+      </div>`
 
     // Get the reference node
     var referenceNode = document.getElementById('addNew');

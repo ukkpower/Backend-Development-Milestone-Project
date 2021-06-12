@@ -3,10 +3,11 @@ from flask import (
     Flask, flash, render_template,
     redirect, request, session, url_for)
 from flask_pymongo import PyMongo
+from datetime import datetime
 from bson.objectid import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from forms import LoginForm, SignUpForm
+from forms import LoginForm, SignUpForm, NewPollForm
 
 if os.path.exists("env.py"):
     import env
@@ -41,9 +42,27 @@ def public():
     return render_template("public.html", polls=polls)
 
 
-@app.route("/new")
+@app.route("/new", methods=["GET", "POST"])
 def new():
-    return render_template("new.html")
+    form = NewPollForm()
+    if request.method == "POST":
+        poll = {
+            "question": request.form.get("question"),
+            "pollQuestions": {
+                "pollOption_1": {
+                    "option": request.form.get("pollOption_1"),
+                    "votes": 0
+                },
+                "pollOption_2": {
+                    "option": request.form.get("pollOption_2"),
+                    "votes": 0
+                }            
+            },
+            "created": datetime.utcnow()
+        }
+        mongo.db.polls.insert_one(poll)
+
+    return render_template("new.html", form=form)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -59,7 +78,6 @@ def login():
             if check_password_hash(
                 existing_user["password"], request.form.get("password")):
                     session["user"] = request.form.get("username").lower()
-                    # flash("Welcome, {}".format(request.form.get("username")))
                     return redirect(url_for("dashboard"))
             else:
                 # invalid password match
@@ -91,7 +109,8 @@ def signup():
             "lastName": request.form.get("lastName"),
             "email": request.form.get("email").lower(),
             "username": request.form.get("username").lower(),
-            "password": generate_password_hash(request.form.get("password"))
+            "password": generate_password_hash(request.form.get("password")),
+            "created": datetime.utcnow()
         }
         mongo.db.users.insert_one(register)
 
