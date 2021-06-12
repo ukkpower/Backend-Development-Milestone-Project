@@ -5,7 +5,9 @@ from flask import (
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
-from forms import RegistrationForm, LoginForm, RecipeForm
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from forms import LoginForm
+
 if os.path.exists("env.py"):
     import env
 
@@ -17,6 +19,14 @@ app.config["MONGO_URI"] = os.environ.get("MONGO_URI")
 app.secret_key = os.environ.get("SECRET_KEY")
 
 mongo = PyMongo(app)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
+
+@login_manager.user_loader
+def load_user(user_id):
+    return user_id
 
 
 @app.route("/")
@@ -37,6 +47,7 @@ def new():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    form = LoginForm()
     if request.method == "POST":
         # check if username exists in db
         existing_user = mongo.db.users.find_one(
@@ -58,7 +69,7 @@ def login():
             flash("Incorrect Username and/or Password", 'error')
             return redirect(url_for("login"))
 
-    return render_template("login.html")
+    return render_template("login.html", form=form)
 
 
 @app.route("/signup", methods=["GET", "POST"])
