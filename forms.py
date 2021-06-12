@@ -9,3 +9,18 @@ class LoginForm(FlaskForm):
     password = PasswordField("Password", validators=[InputRequired(), Length(
         max=50)], render_kw={"placeholder":  "Password"})
     submit = SubmitField("Sign in")
+
+
+class SignUpForm(FlaskForm):
+    firstName = StringField("FirstName", validators=[
+        InputRequired()], render_kw={"placeholder": "First Name"})
+    lastName = StringField("LastName", validators=[
+        InputRequired()], render_kw={"placeholder": "Last Name"})
+    email = StringField("Email", validators=[
+        InputRequired(), Email(message="Invalid Email"), Length(
+            max=50)], render_kw={"placeholder": "Email Address"})
+    username = StringField("Username", validators=[InputRequired(), Length(
+        max=15)], render_kw={"placeholder": "Enter Username"})
+    password = PasswordField("Password", validators=[InputRequired(), Length(
+        max=50)], render_kw={"placeholder":  "Password"})
+    submit = SubmitField("Sign in")

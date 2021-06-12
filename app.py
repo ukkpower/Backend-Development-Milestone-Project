@@ -6,7 +6,7 @@ from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from forms import LoginForm
+from forms import LoginForm, SignUpForm
 
 if os.path.exists("env.py"):
     import env
@@ -23,6 +23,7 @@ mongo = PyMongo(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -74,6 +75,7 @@ def login():
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
+    form = SignUpForm()
     if request.method == "POST":
         # check if username already exists in db
         existing_user = mongo.db.users.find_one(
@@ -95,7 +97,7 @@ def signup():
         flash("Registration Successful! You can now login")
         return redirect(url_for('login'))
 
-    return render_template("signup.html")
+    return render_template("signup.html", form=form)
 
 
 if __name__ == "__main__":
