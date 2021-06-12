@@ -46,9 +46,12 @@
                     <li><a class="nav-link scrollto active" href="{{url_for('public')}}">Public Poll</a></li>
                     <li><a class="nav-link scrollto" href="{{url_for('new')}}">Create Poll</a></li>
 
-
-                    <li><a class="nav-link scrollto" href="{{url_for('login')}}">Login</a></li>
-                    <li><a class="getstarted scrollto" href="{{url_for('signup')}}">Sign Up</a></li>
+                    {% if session.user %}
+                        <li><a class="nav-link scrollto" href="{{url_for('logout')}}">Logout</a></li>
+                    {% else %}
+                        <li><a class="nav-link scrollto" href="{{url_for('login')}}">Login</a></li>
+                        <li><a class="getstarted scrollto" href="{{url_for('signup')}}">Sign Up</a></li>
+                    {% endif %}
                 </ul>
                 <i class="bi bi-list mobile-nav-toggle"></i>
             </nav><!-- .navbar -->
