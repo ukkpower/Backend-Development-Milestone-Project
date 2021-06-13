@@ -3,11 +3,6 @@
   
   <main id="main">
     <section id="signin">
-      {{ poll }}
-
-      {% for key, val in poll['pollQuestions'].items(): %}
-        {{ val.votes }}
-      {% endfor %}
       
   <div class="container">
  <div class="row justify-content-center h-100 align-items-center">
@@ -16,20 +11,16 @@
     <h2>{{ poll.question }}</h2>
     <p class="date">Created by Keith Power <time class="timeago" datetime="2021-06-03T16:19:24+0000" title="3rd June 2021">about 3 hours ago</time></p>
     <p>Choose one or more options:</p>
-    <form>
-
-      <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="exampleCheck1">
-        <label class="form-check-label" for="exampleCheck1">Check me out</label>
+    <form method="POST" action="{{ url_for(request.endpoint, poll_id=poll_id) }}">
+      {% for key, val in poll['pollQuestions'].items(): %}
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="pollOption" value="{{ key }}" id="flexRadioDefault1">
+        <label class="form-check-label" for="flexRadioDefault1">
+          {{ val.option }}
+        </label>
       </div>
-      <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="exampleCheck1">
-        <label class="form-check-label" for="exampleCheck1">Check me out</label>
-      </div>
-      <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="exampleCheck1">
-        <label class="form-check-label" for="exampleCheck1">Check me out</label>
-      </div>
+      {% endfor %}
+      
       <button type="submit" class="btn btn-primary w-75">Submit</button>
     </form>
         

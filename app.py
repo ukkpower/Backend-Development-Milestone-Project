@@ -50,16 +50,11 @@ def new():
         pollOptions = request.form.getlist('pollOption')
         poll = {
             "question": request.form.get("pollQuestion"),
-            "pollQuestions": {
-                "pollOption_1": {
-                    "option": request.form.get("pollOption_1"),
-                    "votes": 0
-                }
-            },
+            "pollQuestions": {},
             "created": datetime.utcnow()
         }
         for i, val in enumerate(pollOptions):
-            poll["pollQuestions"][f"i{i}"] = {'option': val, 'votes': 0}
+            poll["pollQuestions"][f"pollOption_{i}"] = {'option': val, 'votes': 0}
 
         _id = mongo.db.polls.insert_one(poll)
         return redirect(url_for("poll", poll_id=_id.inserted_id))
@@ -67,10 +62,17 @@ def new():
     return render_template("new.html", form=form)
 
 
-@app.route("/poll/<poll_id>")
+@app.route("/poll/<poll_id>", methods=["GET", "POST"])
 def poll(poll_id):
     poll = mongo.db.polls.find_one({"_id": ObjectId(poll_id)})
-    return render_template("poll.html", poll=poll, type=type(poll))
+    if request.method == "POST": 
+        for key, val in poll['pollQuestions'].items():
+            if key == request.form.get('pollOption'):
+                val['votes'] = val['votes'] + 1
+                print(val['votes'])
+                mongo.db.polls.update({"_id": ObjectId(poll_id)}, poll)
+
+    return render_template("poll.html", poll=poll, type=type(poll), poll_id= ObjectId(poll_id))
 
 
 @app.route("/login", methods=["GET", "POST"])
