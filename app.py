@@ -50,11 +50,17 @@ def new():
         pollOptions = request.form.getlist('pollOption')
         poll = {
             "question": request.form.get("pollQuestion"),
+            "totalVotes": 0,
             "pollQuestions": {},
+            "public": False,
+            "user_id": None,
             "created": datetime.utcnow()
         }
         for i, val in enumerate(pollOptions):
-            poll["pollQuestions"][f"pollOption_{i}"] = {'option': val, 'votes': 0}
+            poll["pollQuestions"][f"pollOption_{i}"] = {
+                'option': val,
+                'votes': 0
+                }
 
         _id = mongo.db.polls.insert_one(poll)
         return redirect(url_for("poll", poll_id=_id.inserted_id))
@@ -65,14 +71,25 @@ def new():
 @app.route("/poll/<poll_id>", methods=["GET", "POST"])
 def poll(poll_id):
     poll = mongo.db.polls.find_one({"_id": ObjectId(poll_id)})
-    if request.method == "POST": 
+    if request.method == "POST":
         for key, val in poll['pollQuestions'].items():
             if key == request.form.get('pollOption'):
                 val['votes'] = val['votes'] + 1
-                print(val['votes'])
+                poll['totalVotes'] = poll['totalVotes'] + 1
                 mongo.db.polls.update({"_id": ObjectId(poll_id)}, poll)
+                return redirect(url_for("results", poll_id=poll_id))
 
     return render_template("poll.html", poll=poll, type=type(poll), poll_id= ObjectId(poll_id))
+
+
+@app.route("/results/<poll_id>", methods=["GET", "POST"])
+def results(poll_id):
+    poll = mongo.db.polls.find_one({"_id": ObjectId(poll_id)})
+    # Calculate vote percentages
+    for key, val in poll['pollQuestions'].items():
+        percentage = 100 * float(val['votes'])/float(poll['totalVotes'])
+        val['percent'] = "{:.2f}".format(percentage)
+    return render_template("results.html", poll=poll)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -87,7 +104,10 @@ def login():
             # ensure hashed password matches user input
             if check_password_hash(
                 existing_user["password"], request.form.get("password")):
-                    session["user"] = request.form.get("username").lower()
+                    session['user'] = {
+                        'id': str(ObjectId(existing_user['_id'])),
+                        'username': existing_user['username']
+            }
                     return redirect(url_for("dashboard"))
             else:
                 # invalid password match
@@ -140,7 +160,13 @@ def logout():
 
 @app.route("/dashboard")
 def dashboard():
-    return render_template("dashboard.html")
+    if not session.get("user") is None:
+        # grab the session user's username from db
+        username = mongo.db.users.find_one(
+            {"username": session["user"]["username"]})
+        return render_template("dashboard.html", username=username)
+
+    return redirect(url_for("login"))
 
 
 if __name__ == "__main__":
