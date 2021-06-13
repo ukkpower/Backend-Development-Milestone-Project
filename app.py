@@ -8,6 +8,7 @@ from bson.objectid import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from forms import LoginForm, SignUpForm, NewPollForm
+import sys
 
 if os.path.exists("env.py"):
     import env
@@ -46,23 +47,30 @@ def public():
 def new():
     form = NewPollForm()
     if request.method == "POST":
+        pollOptions = request.form.getlist('pollOption')
         poll = {
-            "question": request.form.get("question"),
+            "question": request.form.get("pollQuestion"),
             "pollQuestions": {
                 "pollOption_1": {
                     "option": request.form.get("pollOption_1"),
                     "votes": 0
-                },
-                "pollOption_2": {
-                    "option": request.form.get("pollOption_2"),
-                    "votes": 0
-                }            
+                }
             },
             "created": datetime.utcnow()
         }
-        mongo.db.polls.insert_one(poll)
+        for i, val in enumerate(pollOptions):
+            poll["pollQuestions"][f"i{i}"] = {'option': val, 'votes': 0}
+
+        _id = mongo.db.polls.insert_one(poll)
+        return redirect(url_for("poll", poll_id=_id.inserted_id))
 
     return render_template("new.html", form=form)
+
+
+@app.route("/poll/<poll_id>")
+def poll(poll_id):
+    poll = mongo.db.polls.find_one({"_id": ObjectId(poll_id)})
+    return render_template("poll.html", poll=poll, type=type(poll))
 
 
 @app.route("/login", methods=["GET", "POST"])

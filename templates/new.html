@@ -3,7 +3,7 @@
 
 <main id="main">
   <section id="signin">
-
+    {{ pollOptions }}
     <div class="container">
       <div class="row justify-content-center align-items-center">
         <div class="col-md-8">
@@ -13,7 +13,7 @@
           <form method="POST" action="{{ url_for('new') }}">
             {{form.hidden_tag()}}
             <!-- Poll Question -->
-            <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label>
+            <label for="pollQuestion" class="form-label">Example textarea</label>
             <div class="form-floating">
                 {{form.pollQuestion(class_="form-control", style="height: 100px")}}
               <label for="pollQuestion">Comments</label>
@@ -22,17 +22,17 @@
             <!-- Poll Options -->
             <div class="mb-3">
               <label for="exampleFormControlTextarea1" class="form-label">Poll option</label>
-              {{form.pollOption_1(class_="form-control")}}
+              {{form.pollOption(class_="form-control")}}
             </div>
 
             <div class="mb-3">
               <label for="exampleFormControlTextarea1" class="form-label">Poll option</label>
-              {{form.pollOption_2(class_="form-control")}}
+              {{form.pollOption(class_="form-control")}}
             </div>
 
             <div class="mb-3">
               <label for="exampleFormControlTextarea1" class="form-label">Poll option</label>
-              {{form.pollOption_3(class_="form-control")}}
+              {{form.pollOption(class_="form-control")}}
             </div>
 
             <button id="addNew" type="button" class="btn btn-primary" onclick="addOption()">Add Another Option</button>
@@ -61,14 +61,12 @@
 </main>
 
 <script>
-  let optionCount = 3;
   function addOption() {
-    optionCount++;
     // Create a new element
     var newNode = document.createElement('div');
     newNode.innerHTML = `<div class="mb-3">
         <label for="exampleFormControlTextarea1" class="form-label">Poll option</label>
-        <input class="form-control" id="pollOption_${optionCount}">
+        <input class="form-control" id="pollOption">
       </div>`
 
     // Get the reference node

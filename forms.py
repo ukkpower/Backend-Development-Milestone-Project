@@ -29,8 +29,7 @@ class SignUpForm(FlaskForm):
 class NewPollForm(FlaskForm):
     pollQuestion = TextAreaField("Question", validators=[
         InputRequired()], render_kw={"placeholder": "Question"})
-    pollOption_1 = StringField("Poll Option", validators=[
-        InputRequired()], render_kw={"placeholder": "Poll Option"})
+    pollOption = StringField("Poll Option", render_kw={"placeholder": "Poll Option"})
     pollOption_2 = StringField("Poll Option", validators=[
         InputRequired()], render_kw={"placeholder": "Poll Option"})
     pollOption_3 = StringField("Poll Option", render_kw={"placeholder": "Poll Option"})        
