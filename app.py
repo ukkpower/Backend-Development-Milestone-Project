@@ -158,8 +158,19 @@ def logout():
     return redirect(url_for("login"))
 
 
-@app.route("/dashboard")
+@app.route("/user/dashboard")
 def dashboard():
+    if not session.get("user") is None:
+        # grab the session user's username from db
+        username = mongo.db.users.find_one(
+            {"username": session["user"]["username"]})
+        return render_template("dashboard.html", username=username)
+
+    return redirect(url_for("login"))
+
+
+@app.route("/user/polls")
+def userPolls():
     if not session.get("user") is None:
         # grab the session user's username from db
         username = mongo.db.users.find_one(
