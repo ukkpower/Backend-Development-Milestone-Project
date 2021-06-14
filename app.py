@@ -164,7 +164,10 @@ def dashboard():
         # grab the session user's username from db
         username = mongo.db.users.find_one(
             {"username": session["user"]["username"]})
-        return render_template("dashboard.html", username=username)
+        polls = list(mongo.db.polls.find(
+            {"username": session["user"]["username"]}))
+        print(len(polls))
+        return render_template("user/dashboard.html", username=username)
 
     return redirect(url_for("login"))
 
@@ -175,7 +178,33 @@ def userPolls():
         # grab the session user's username from db
         username = mongo.db.users.find_one(
             {"username": session["user"]["username"]})
-        return render_template("dashboard.html", username=username)
+        polls = list(mongo.db.polls.find(
+            {"username": session["user"]["username"]}))
+        return render_template("user/polls.html", username=username)
+
+    return redirect(url_for("login"))
+
+
+@app.route("/user/votes")
+def userVotes():
+    if not session.get("user") is None:
+        # grab the session user's username from db
+        username = mongo.db.users.find_one(
+            {"username": session["user"]["username"]})
+        polls = list(mongo.db.polls.find(
+            {"username": session["user"]["username"]}))
+        return render_template("user/votes.html", username=username)
+
+    return redirect(url_for("login"))
+
+
+@app.route("/user/profile")
+def userProfile():
+    if not session.get("user") is None:
+        # grab the session user's username from db
+        username = mongo.db.users.find_one(
+            {"username": session["user"]["username"]})
+        return render_template("user/profile.html", username=username)
 
     return redirect(url_for("login"))
 
