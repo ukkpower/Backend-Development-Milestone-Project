@@ -51,22 +51,7 @@ def public(page_number=1):
     page_count = round(doc_count / PAGE_LIMIT)
     polls = list(mongo.db.polls.find(filter).sort([['_id', -1]]).skip((page_number-1)*PAGE_LIMIT).limit(PAGE_LIMIT))
     for poll in polls:
-        now = datetime.now()
-        age = now - poll['created']
-        if age.days == 0:
-            time = age.seconds//3600
-            if time <= 1:
-                time = 1
-                time_text = " hour"
-            else:
-                time_text = " hours"
-        else:
-            time = age.days
-            if time == 1:
-                time_text = " day"
-            else:
-                time_text = " days"
-        poll['timeSince'] = str(time) + time_text
+        poll['timeSince'] = time_since(poll['created'])
 
     return render_template(
         "public.html",
@@ -239,6 +224,25 @@ def userProfile():
         return render_template("user/profile.html", username=username)
 
     return redirect(url_for("login"))
+
+
+def time_since(created):
+    now = datetime.now()
+    age = now - created
+    if age.days == 0:
+        time = age.seconds//3600
+        if time <= 1:
+            time = 1
+            time_text = " hour"
+        else:
+            time_text = " hours"
+    else:
+        time = age.days
+        if time == 1:
+            time_text = " day"
+        else:
+            time_text = " days"
+    return str(time) + time_text
 
 
 if __name__ == "__main__":
