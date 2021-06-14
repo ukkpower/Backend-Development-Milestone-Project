@@ -48,10 +48,9 @@ def public(page_number=1):
     filter = {"public": True}
     # Page count
     doc_count = mongo.db.polls.count_documents(filter)
-    page_count = doc_count / PAGE_LIMIT
+    page_count = round(doc_count / PAGE_LIMIT)
     polls = list(mongo.db.polls.find(filter).sort([['_id', -1]]).skip((page_number-1)*PAGE_LIMIT).limit(PAGE_LIMIT))
     for poll in polls:
-        # timeStamp_dt = datetime.strptime(poll['created'], '%Y-%m-%dT%H:%M:%SZ')
         now = datetime.now()
         age = now - poll['created']
         if age.days == 0:
@@ -69,7 +68,11 @@ def public(page_number=1):
                 time_text = " days"
         poll['timeSince'] = str(time) + time_text
 
-    return render_template("public.html", polls=polls, page_number=page_number, page_count=page_count)
+    return render_template(
+        "public.html",
+        polls=polls,
+        page_number=page_number,
+        page_count=page_count)
 
 
 @app.route("/new", methods=["GET", "POST"])
