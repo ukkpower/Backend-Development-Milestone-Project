@@ -38,9 +38,38 @@ def index():
 
 
 @app.route("/public")
-def public():
-    polls = mongo.db.polls.find()
-    return render_template("public.html", polls=polls)
+@app.route("/public/<page_number>", methods=['GET', 'POST'])
+def public(page_number=1):
+    # Number of results per page
+    PAGE_LIMIT = 1
+    # URL arguments passed as strings, need to convert to int for query
+    page_number = int(page_number)
+
+    filter = {"public": True}
+    # Page count
+    doc_count = mongo.db.polls.count_documents(filter)
+    page_count = doc_count / PAGE_LIMIT
+    polls = list(mongo.db.polls.find(filter).sort([['_id', -1]]).skip((page_number-1)*PAGE_LIMIT).limit(PAGE_LIMIT))
+    for poll in polls:
+        # timeStamp_dt = datetime.strptime(poll['created'], '%Y-%m-%dT%H:%M:%SZ')
+        now = datetime.now()
+        age = now - poll['created']
+        if age.days == 0:
+            time = age.seconds//3600
+            if time <= 1:
+                time = 1
+                time_text = " hour"
+            else:
+                time_text = " hours"
+        else:
+            time = age.days
+            if time == 1:
+                time_text = " day"
+            else:
+                time_text = " days"
+        poll['timeSince'] = str(time) + time_text
+
+    return render_template("public.html", polls=polls, page_number=page_number, page_count=page_count)
 
 
 @app.route("/new", methods=["GET", "POST"])
