@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+
+<main id="main">
+  <section id="signin">
+    {{ pollOptions }}
+    <div class="container">
+      <div class="row justify-content-center align-items-center">
+        <div class="col-md-8">
+          <h2>Create a poll</h2>
+          <p>Complete the below fields to create your poll</p>
+
+          <form method="POST" action="{{ url_for('new') }}">
+            {{form.hidden_tag()}}
+            <!-- Poll Question -->
+            <label for="pollQuestion" class="form-label">Example textarea</label>
+            <div class="form-floating">
+                {{form.pollQuestion(class_="form-control", style="height: 100px")}}
+              <label for="pollQuestion">Comments</label>
+            </div>
+
+            <!-- Poll Options -->
+            {% for key, val in poll['pollQuestions'].items(): %}
+            <div class="mb-3">
+              <label for="exampleFormControlTextarea1" class="form-label">Poll option</label>
+              <input class="form-control" id="pollOption" name="pollOption" placeholder="Poll Option" type="text" value="{{ val.option }}">
+            </div>
+            {% endfor %}
+
+            <button id="addNew" type="button" class="btn btn-primary" onclick="addOption()">Add Another Option</button>
+
+            <div id="poll-options">
+              <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                <label class="form-check-label" for="exampleCheck1">Check me out</label>
+              </div>
+              <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                <label class="form-check-label" for="exampleCheck1">Check me out</label>
+              </div>
+              <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                <label class="form-check-label" for="exampleCheck1">Check me out</label>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-75">Submit</button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  function addOption() {
+    // Create a new element
+    var newNode = document.createElement('div');
+    newNode.innerHTML = `<div class="mb-3">
+        <label for="exampleFormControlTextarea1" class="form-label">Poll option</label>
+        <input class="form-control" id="pollOption">
+      </div>`
+
+    // Get the reference node
+    var referenceNode = document.getElementById('addNew');
+
+    referenceNode.parentNode.insertBefore(newNode, referenceNode);
+  };
+</script>
+
+{% endblock %}

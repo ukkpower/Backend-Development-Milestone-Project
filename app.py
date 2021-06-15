@@ -97,6 +97,29 @@ def delete(poll_id):
     return redirect(url_for("userPolls"))
 
 
+@app.route("/user/update/<poll_id>", methods=["GET", "POST"])
+def update(poll_id):
+    form = NewPollForm()
+    poll = mongo.db.polls.find_one({"_id": ObjectId(poll_id)})
+    form.pollQuestion.process_data(poll["question"])
+    if request.method == "POST":
+        pollOptions = request.form.getlist('pollOption')
+        poll = {
+            "question": request.form.get("pollQuestion"),
+            "pollQuestions": {},
+        }
+        for i, val in enumerate(pollOptions):
+            if val:
+                poll["pollQuestions"][f"pollOption_{i}"] = {
+                    'option': val,
+                    'votes': 0
+                    }
+        mongo.db.polls.update({"_id": ObjectId(poll_id)}, poll)
+        return redirect(url_for("userPolls", poll_id=poll_id))
+
+    return render_template("user/update.html", poll=poll, form=form)
+
+
 @app.route("/poll/<poll_id>", methods=["GET", "POST"])
 def poll(poll_id):
     poll = mongo.db.polls.find_one({"_id": ObjectId(poll_id)})
