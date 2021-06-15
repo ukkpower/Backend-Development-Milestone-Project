@@ -1,48 +1,36 @@
 {% extends "base-user.html" %}
 {% block content %}
 
-  <main id="main">
-    <section id="signin">
- 
-  <div class="container">
- <div class="row justify-content-center align-items-center">
-   <div class="col-md-8">
-    <h2>Dashboard</h2>
-    <p>Below are some stats around your activity.</p>
+<main id="main">
+  <section id="signin">
 
-    <!-- ======= Values Section ======= -->
-    <section id="values" class="values">
+    <div class="container">
+      <div class="row justify-content-center align-items-center">
+        <div class="col-md-8">
+          <h2>Dashboard</h2>
+          <p>Below are some stats around your activity.</p>
 
-      <div class="container" data-aos="fade-up">
 
-        <div class="row">
 
-          <div class="col-md-8">
-            <div class="box" data-aos="fade-up" data-aos-delay="200">
-              <img src="assets/img/values-1.png" class="img-fluid" alt="">
-              <h3>Create a new Poll</h3>
-              <p>Just click an create a new poll to share in minutes</p>
-            </div>
-          </div>
-
-          <div class="col-lg-4 mt-4 mt-lg-0">
-            <div class="box" data-aos="fade-up" data-aos-delay="600">
-              <img src="assets/img/values-3.png" class="img-fluid" alt="">
-              <h3>Fugit cupiditate alias nobis.</h3>
-              <p>Quam rem vitae est autem molestias explicabo debitis sint. Vero aliquid quidem commodi.</p>
-            </div>
+          <div class="col-md-10">
+            {% for poll in polls %}
+            <a class="card mb-3" href="{{url_for('poll', poll_id=poll._id)}}">
+              <div class="card-body">
+                <h2 class="card-title">{{ poll.question }}</h2>
+                <p class="date">Created <time class="timeago" datetime="2021-06-03T16:19:24+0000"
+                    title="3rd June 2021">about {{ poll.timeSince }} ago</time></p>
+                <span class="badge rounded-pill bg-success">{{ poll.totalVotes }} Votes</span>
+              </div>
+            </a>
+            {% endfor %}
           </div>
 
         </div>
 
       </div>
 
-    </section><!-- End Values Section -->
-
-      </div>
-    </div> 
-  </div>
-</section>
+    </div>
+  </section>
 </main>
 
 {% endblock %}

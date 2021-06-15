@@ -204,7 +204,7 @@ def userPolls():
             {"username": session["user"]["username"]})
         polls = list(mongo.db.polls.find(
             {"user_id": session["user"]["id"]}))
-        return render_template("user/polls.html", username=username)
+        return render_template("user/polls.html", username=username, polls=polls)
 
     return redirect(url_for("login"))
 
