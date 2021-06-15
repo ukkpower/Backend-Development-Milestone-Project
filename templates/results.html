@@ -18,10 +18,10 @@
               {% for key, val in poll['pollQuestions'].items(): %}
               <div class="card mb-3">
                 <div class="card-body">
-                  <h2 class="card-title">{{ key }}</h2>
+                  <h2 class="card-title">{{ val.option }}</h2>
                   <p class="percent">{{ val.percent }}%</p>
                   <div class="progress">
-                    <div class="progress-bar w-75" role="progressbar" aria-valuenow="75" aria-valuemin="0"
+                    <div class="progress-bar w-{{ val.percent }}" role="progressbar" aria-valuenow="{{ val.percent }}" aria-valuemin="0"
                       aria-valuemax="100"></div>
                   </div>
                   <p class="votes">{{ val.votes }} Votes</p>

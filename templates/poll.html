@@ -9,7 +9,7 @@
    <div class="col-md-8">
     <h2 class="fs-1">Q</h2>
     <h2>{{ poll.question }}</h2>
-    <p class="date">Created by Keith Power <time class="timeago" datetime="2021-06-03T16:19:24+0000" title="3rd June 2021">about 3 hours ago</time></p>
+    <p class="date">Created by {{ poll.userFullName }} <time class="timeago" datetime="2021-06-03T16:19:24+0000" title="3rd June 2021">about {{ poll.timeSince }} ago</time></p>
     <p>Choose one or more options:</p>
     <form method="POST" action="{{ url_for(request.endpoint, poll_id=poll_id) }}">
       {% for key, val in poll['pollQuestions'].items(): %}

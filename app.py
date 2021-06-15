@@ -71,13 +71,18 @@ def new():
             "pollQuestions": {},
             "public": False,
             "user_id": None,
-            "created": datetime.utcnow()
+            "created": datetime.utcnow(),
+            "userFullName": "anonymous"
         }
+        if not session.get("user") is None:
+            poll["user_id"] = session["user"]["id"]
+            poll["userFullName"] = session["user"]["name"]
         for i, val in enumerate(pollOptions):
-            poll["pollQuestions"][f"pollOption_{i}"] = {
-                'option': val,
-                'votes': 0
-                }
+            if val:
+                poll["pollQuestions"][f"pollOption_{i}"] = {
+                    'option': val,
+                    'votes': 0
+                    }
 
         _id = mongo.db.polls.insert_one(poll)
         return redirect(url_for("poll", poll_id=_id.inserted_id))
@@ -88,6 +93,7 @@ def new():
 @app.route("/poll/<poll_id>", methods=["GET", "POST"])
 def poll(poll_id):
     poll = mongo.db.polls.find_one({"_id": ObjectId(poll_id)})
+    poll['timeSince'] = time_since(poll['created'])
     if request.method == "POST":
         for key, val in poll['pollQuestions'].items():
             if key == request.form.get('pollOption'):
@@ -105,7 +111,7 @@ def results(poll_id):
     # Calculate vote percentages
     for key, val in poll['pollQuestions'].items():
         percentage = 100 * float(val['votes'])/float(poll['totalVotes'])
-        val['percent'] = "{:.2f}".format(percentage)
+        val['percent'] = "{:.0f}".format(percentage)
     return render_template("results.html", poll=poll)
 
 
@@ -123,8 +129,9 @@ def login():
                 existing_user["password"], request.form.get("password")):
                     session['user'] = {
                         'id': str(ObjectId(existing_user['_id'])),
-                        'username': existing_user['username']
-            }
+                        'username': existing_user['username'],
+                        'name': existing_user['firstName'] + " " + existing_user['lastName']
+                    }
                     return redirect(url_for("dashboard"))
             else:
                 # invalid password match
@@ -182,8 +189,8 @@ def dashboard():
         username = mongo.db.users.find_one(
             {"username": session["user"]["username"]})
         polls = list(mongo.db.polls.find(
-            {"username": session["user"]["username"]}))
-        print(len(polls))
+            {"user_id": session["user"]["id"]}))
+      
         return render_template("user/dashboard.html", username=username)
 
     return redirect(url_for("login"))
@@ -196,7 +203,7 @@ def userPolls():
         username = mongo.db.users.find_one(
             {"username": session["user"]["username"]})
         polls = list(mongo.db.polls.find(
-            {"username": session["user"]["username"]}))
+            {"user_id": session["user"]["id"]}))
         return render_template("user/polls.html", username=username)
 
     return redirect(url_for("login"))
@@ -209,7 +216,7 @@ def userVotes():
         username = mongo.db.users.find_one(
             {"username": session["user"]["username"]})
         polls = list(mongo.db.polls.find(
-            {"username": session["user"]["username"]}))
+            {"user_id": session["user"]["id"]}))
         return render_template("user/votes.html", username=username)
 
     return redirect(url_for("login"))
@@ -220,7 +227,7 @@ def userProfile():
     if not session.get("user") is None:
         # grab the session user's username from db
         username = mongo.db.users.find_one(
-            {"username": session["user"]["username"]})
+            {"user_id": session["user"]["id"]})
         return render_template("user/profile.html", username=username)
 
     return redirect(url_for("login"))
