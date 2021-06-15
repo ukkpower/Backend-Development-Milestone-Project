@@ -90,6 +90,13 @@ def new():
     return render_template("new.html", form=form)
 
 
+@app.route("/delete/<poll_id>", methods=["GET", "POST"])
+def delete(poll_id):
+    mongo.db.polls.delete_one({"_id": ObjectId(poll_id)})
+    flash("Poll now deleted")
+    return redirect(url_for("userPolls"))
+
+
 @app.route("/poll/<poll_id>", methods=["GET", "POST"])
 def poll(poll_id):
     poll = mongo.db.polls.find_one({"_id": ObjectId(poll_id)})
