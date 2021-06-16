@@ -1,7 +1,7 @@
 import os
 from flask import (
     Flask, flash, render_template,
-    redirect, request, session, url_for)
+    redirect, request, session, url_for, jsonify)
 from flask_pymongo import PyMongo
 from datetime import datetime
 from bson.objectid import ObjectId
@@ -9,6 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from forms import LoginForm, SignUpForm, NewPollForm
 import sys
+import json
 
 if os.path.exists("env.py"):
     import env
@@ -261,6 +262,22 @@ def userProfile():
         return render_template("user/profile.html", username=username)
 
     return redirect(url_for("login"))
+
+
+@app.route('/api/results')
+def apiResults():
+    filter = {"public": True}
+    polls = list(mongo.db.polls.find(filter))
+    data = []
+    for doc in polls:
+        doc['_id'] = str(doc['_id']) # This does the trick!
+        data.append(doc)
+    return jsonify(data)
+
+
+@app.route('/api/polls', methods=['POST'])
+def apiPoll():
+    return
 
 
 def time_since(created):
