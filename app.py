@@ -275,9 +275,15 @@ def apiResults():
     return jsonify(data)
 
 
-@app.route('/api/polls', methods=['POST'])
+@app.route('/api/polls')
 def apiPoll():
-    return
+    filter = {"public": True}
+    polls = list(mongo.db.polls.find(filter))
+    data = []
+    for doc in polls:
+        doc['_id'] = str(doc['_id']) # This does the trick!
+        data.append(doc)
+    return jsonify(data)
 
 
 def time_since(created):
