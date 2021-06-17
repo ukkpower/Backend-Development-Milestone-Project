@@ -66,6 +66,12 @@ def new():
     form = NewPollForm()
     if request.method == "POST":
         pollOptions = request.form.getlist('pollOption')
+        if request.form.get("end-date"):
+            endDate = datetime.strptime(request.form.get("end-date"), "%m/%d/%Y")
+            timestamp = datetime.timestamp(endDate)
+            timestamp = datetime.utcfromtimestamp(timestamp)
+        else:
+            timestamp = None
         poll = {
             "question": request.form.get("pollQuestion"),
             "totalVotes": 0,
@@ -73,7 +79,8 @@ def new():
             "public": False,
             "user_id": None,
             "created": datetime.utcnow(),
-            "userFullName": "anonymous"
+            "userFullName": "anonymous",
+            "endDate": timestamp
         }
         if not session.get("user") is None:
             poll["user_id"] = session["user"]["id"]
@@ -124,6 +131,12 @@ def update(poll_id):
 @app.route("/poll/<poll_id>", methods=["GET", "POST"])
 def poll(poll_id):
     poll = mongo.db.polls.find_one({"_id": ObjectId(poll_id)})
+    # Check to see is the poll open for voting
+    if poll['endDate']:
+        print(poll['endDate'])
+        now = datetime.utcnow()
+        if now > poll['endDate']:
+            return redirect(url_for("results", poll_id=poll_id))
     poll['timeSince'] = time_since(poll['created'])
     if request.method == "POST":
         for key, val in poll['pollQuestions'].items():
