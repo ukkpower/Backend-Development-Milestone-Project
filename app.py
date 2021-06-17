@@ -154,8 +154,11 @@ def results(poll_id):
     poll = mongo.db.polls.find_one({"_id": ObjectId(poll_id)})
     # Calculate vote percentages
     for key, val in poll['pollQuestions'].items():
-        percentage = 100 * float(val['votes'])/float(poll['totalVotes'])
-        val['percent'] = "{:.0f}".format(percentage)
+        if poll['totalVotes'] > 0:
+            percentage = 100 * float(val['votes'])/float(poll['totalVotes'])
+            val['percent'] = "{:.0f}".format(percentage)
+        else:
+            val['percent'] = 0
     return render_template("results.html", poll=poll)
 
 
