@@ -1,48 +1,47 @@
 {% extends "base-user.html" %}
 {% block content %}
 
-  <main id="main">
-    <section id="signin">
- 
+<main id="main-user">
+
   <div class="container">
- <div class="row justify-content-center align-items-center">
-   <div class="col-md-8">
-    <h2>Dashboard</h2>
-    <p>Below are some stats around your activity.</p>
+    <div class="row justify-content-center align-items-center">
+      <div class="col-md-8">
+          <header class="page-head">
+            <h1 class="page-title">Dashboard</h1>
+            <p class="page-subtitle">Below are some stats around your activity.</p>
+          </header>
+          
+          <!-- ======= Values Section ======= -->
+          <section id="values" class="values">
 
-    <!-- ======= Values Section ======= -->
-    <section id="values" class="values">
+            <div data-aos="fade-up">
 
-      <div class="container" data-aos="fade-up">
+              <div class="row">
 
-        <div class="row">
+                <div class="col-md-8">
+                  <div id="welcome" class="box" data-aos="fade-up" data-aos-delay="200">
+                    <h3>Create a new Poll</h3>
+                    <p>Just click an create a new poll to share in minutes</p>
+                    <a class="btn btn-primary w-75" href="{{url_for('new')}}">Create A Poll</a>
+                  </div>
+                </div>
 
-          <div class="col-md-8">
-            <div class="box" data-aos="fade-up" data-aos-delay="200">
-              <img src="assets/img/values-1.png" class="img-fluid" alt="">
-              <h3>Create a new Poll</h3>
-              <p>Just click an create a new poll to share in minutes</p>
+                <div class="col-lg-4 mt-4 mt-lg-0">
+                  <div class="box" data-aos="fade-up" data-aos-delay="600">
+                    <h3>Polls Created</h3>
+                    <p id="polls-created">{{polls}}</p>
+                  </div>
+                </div>
+
+              </div>
+
             </div>
-          </div>
 
-          <div class="col-lg-4 mt-4 mt-lg-0">
-            <div class="box" data-aos="fade-up" data-aos-delay="600">
-              <img src="assets/img/values-3.png" class="img-fluid" alt="">
-              <h3>Fugit cupiditate alias nobis.</h3>
-              <p>Quam rem vitae est autem molestias explicabo debitis sint. Vero aliquid quidem commodi.</p>
-            </div>
-          </div>
+          </section><!-- End Values Section -->
 
         </div>
-
       </div>
-
-    </section><!-- End Values Section -->
-
-      </div>
-    </div> 
-  </div>
-</section>
+    </div>
 </main>
 
 {% endblock %}

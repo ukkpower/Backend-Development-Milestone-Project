@@ -2,6 +2,7 @@ from flask import (
     Flask, flash, render_template,
     redirect, request, session, url_for, jsonify)
 
+
 def test_index(app, client):
     res = client.get('/')
     assert res.status_code == 200

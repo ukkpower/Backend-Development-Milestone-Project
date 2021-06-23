@@ -1,15 +1,12 @@
 import os
 from flask import (
     Flask, flash, render_template,
-    redirect, request, session, url_for, jsonify)
+    redirect, request, session, url_for, jsonify, Markup)
 from flask_pymongo import PyMongo
 from datetime import datetime
 from bson.objectid import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from forms import LoginForm, SignUpForm, NewPollForm
-import sys
-import json
 
 if os.path.exists("env.py"):
     import env
@@ -23,26 +20,19 @@ app.secret_key = os.environ.get("SECRET_KEY")
 
 mongo = PyMongo(app)
 
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = "login"
 
-
-@login_manager.user_loader
-def load_user(user_id):
-    return user_id
-
-
+# Homepage
 @app.route("/")
 def index():
     return render_template("index.html")
 
 
+# Public Polls - paginated
 @app.route("/public")
 @app.route("/public/<page_number>", methods=['GET', 'POST'])
 def public(page_number=1):
     # Number of results per page
-    PAGE_LIMIT = 1
+    PAGE_LIMIT = 10
     # URL arguments passed as strings, need to convert to int for query
     page_number = int(page_number)
 
@@ -61,6 +51,7 @@ def public(page_number=1):
         page_count=page_count)
 
 
+# Create New Poll
 @app.route("/new", methods=["GET", "POST"])
 def new():
     form = NewPollForm()
@@ -76,7 +67,7 @@ def new():
             "question": request.form.get("pollQuestion"),
             "totalVotes": 0,
             "pollQuestions": {},
-            "public": False,
+            "public": str2bool(request.form.get("status")),
             "user_id": None,
             "created": datetime.utcnow(),
             "userFullName": "anonymous",
@@ -93,11 +84,14 @@ def new():
                     }
 
         _id = mongo.db.polls.insert_one(poll)
+        message = Markup("Your poll is now created. To jump to see the share options go here: <a href='"+url_for("results", poll_id=_id.inserted_id)+"'> Share</a>")
+        flash(message)
         return redirect(url_for("poll", poll_id=_id.inserted_id))
 
     return render_template("new.html", form=form)
 
 
+# Delete Poll
 @app.route("/delete/<poll_id>", methods=["GET", "POST"])
 def delete(poll_id):
     mongo.db.polls.delete_one({"_id": ObjectId(poll_id)})
@@ -105,6 +99,7 @@ def delete(poll_id):
     return redirect(url_for("userPolls"))
 
 
+# Update a Poll if a user account is the owner
 @app.route("/user/update/<poll_id>", methods=["GET", "POST"])
 def update(poll_id):
     form = NewPollForm()
@@ -128,15 +123,24 @@ def update(poll_id):
     return render_template("user/update.html", poll=poll, form=form)
 
 
+# View Poll if open for voting
 @app.route("/poll/<poll_id>", methods=["GET", "POST"])
 def poll(poll_id):
     poll = mongo.db.polls.find_one({"_id": ObjectId(poll_id)})
     # Check to see is the poll open for voting
+    if not session.get("voted_polls") is None:
+        if poll_id in session['voted_polls']:
+            flash("You have alread submitted a vote")
+            return redirect(url_for("results", poll_id=poll_id))
+
     if poll['endDate']:
-        print(poll['endDate'])
         now = datetime.utcnow()
         if now > poll['endDate']:
+            flash("This poll is now closed for voting")
             return redirect(url_for("results", poll_id=poll_id))
+
+    # Check to see if user has already voted
+
     poll['timeSince'] = time_since(poll['created'])
     if request.method == "POST":
         for key, val in poll['pollQuestions'].items():
@@ -144,6 +148,11 @@ def poll(poll_id):
                 val['votes'] = val['votes'] + 1
                 poll['totalVotes'] = poll['totalVotes'] + 1
                 mongo.db.polls.update({"_id": ObjectId(poll_id)}, poll)
+                # Add poll_id to user session to prevent multiple votes
+                if 'voted_polls' not in session:
+                    session['voted_polls'] = []
+                session['voted_polls'].append(poll_id)
+                session.modified = True
                 return redirect(url_for("results", poll_id=poll_id))
 
     return render_template("poll.html", poll=poll, type=type(poll), poll_id= ObjectId(poll_id))
@@ -159,7 +168,7 @@ def results(poll_id):
             val['percent'] = "{:.0f}".format(percentage)
         else:
             val['percent'] = 0
-    return render_template("results.html", poll=poll)
+    return render_template("results.html", poll=poll, poll_id= ObjectId(poll_id))
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -171,6 +180,9 @@ def login():
             {"username": request.form.get("username").lower()})
 
         if existing_user:
+            if request.form.get('remember-me'):
+                session.permanent = True
+                
             # ensure hashed password matches user input
             if check_password_hash(
                 existing_user["password"], request.form.get("password")):
@@ -235,10 +247,12 @@ def dashboard():
         # grab the session user's username from db
         username = mongo.db.users.find_one(
             {"username": session["user"]["username"]})
-        polls = list(mongo.db.polls.find(
-            {"user_id": session["user"]["id"]}))
+        polls = mongo.db.polls.count_documents(
+            {"user_id": session["user"]["id"]})
+
+        print(polls)
       
-        return render_template("user/dashboard.html", username=username)
+        return render_template("user/dashboard.html", username=username, polls=polls)
 
     return redirect(url_for("login"))
 
@@ -264,7 +278,7 @@ def userVotes():
             {"username": session["user"]["username"]})
         polls = list(mongo.db.polls.find(
             {"user_id": session["user"]["id"]}))
-        return render_template("user/votes.html", username=username)
+        return render_template("user/votes.html", username=username, polls=polls)
 
     return redirect(url_for("login"))
 
@@ -273,9 +287,10 @@ def userVotes():
 def userProfile():
     if not session.get("user") is None:
         # grab the session user's username from db
-        username = mongo.db.users.find_one(
-            {"user_id": session["user"]["id"]})
-        return render_template("user/profile.html", username=username)
+        user = mongo.db.users.find_one(
+            {"username": session["user"]["username"]})
+        print(session)
+        return render_template("user/profile.html", user=user)
 
     return redirect(url_for("login"))
 
@@ -286,7 +301,7 @@ def apiResults():
     polls = list(mongo.db.polls.find(filter))
     data = []
     for doc in polls:
-        doc['_id'] = str(doc['_id']) # This does the trick!
+        doc['_id'] = str(doc['_id'])
         data.append(doc)
     return jsonify(data)
 
@@ -297,11 +312,12 @@ def apiPoll():
     polls = list(mongo.db.polls.find(filter))
     data = []
     for doc in polls:
-        doc['_id'] = str(doc['_id']) # This does the trick!
+        doc['_id'] = str(doc['_id'])
         data.append(doc)
     return jsonify(data)
 
 
+# Calc diff in time 
 def time_since(created):
     now = datetime.now()
     age = now - created
@@ -320,9 +336,14 @@ def time_since(created):
             time_text = " days"
     return str(time) + time_text
 
+# Convert string to bool 
+def str2bool(v):
+
+    return str(v).lower() in ("yes", "true", "t", "1")
+
 
 if __name__ == "__main__":
     app.run(
         host=os.environ.get("IP", "0.0.0.0"),
         port=int(os.environ.get("PORT", "5000")),
-        debug=True)
+        debug=False)

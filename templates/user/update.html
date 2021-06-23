@@ -1,55 +1,73 @@
 {% extends "base.html" %}
 {% block content %}
 
-<main id="main">
-  <section id="signin">
-    {{ pollOptions }}
-    <div class="container">
-      <div class="row justify-content-center align-items-center">
-        <div class="col-md-8">
-          <h2>Create a poll</h2>
-          <p>Complete the below fields to create your poll</p>
+<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+  integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
 
-          <form method="POST" action="{{ url_for('new') }}">
-            {{form.hidden_tag()}}
-            <!-- Poll Question -->
-            <label for="pollQuestion" class="form-label">Example textarea</label>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"
+  integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<main id="main-user">
+  {{ pollOptions }}
+  <div class="container">
+    <div class="row justify-content-center align-items-center">
+      <div class="col-md-8">
+        <header class="page-head">
+          <h1 class="page-title">Edit your poll</h1>
+          <p class="page-subtitle">Fill out as many poll question options as you need</p>
+        </header>
+
+        <form method="POST" action="{{ url_for('new') }}">
+          {{form.hidden_tag()}}
+          <!-- Poll Question -->
+          <div class="poll-question mb-4">
+            <label for="pollQuestion" class="form-label">Write your Poll quesion:</label>
             <div class="form-floating">
-                {{form.pollQuestion(class_="form-control", style="height: 100px")}}
-              <label for="pollQuestion">Comments</label>
+              {{form.pollQuestion(class_="form-control", style="height: 100px")}}
+            </div>
+          </div>
+
+          <!-- Poll Options -->
+          {% for key, val in poll['pollQuestions'].items(): %}
+          <div class="mb-4">
+            <label for="{{ key }}" class="form-label">Poll option</label>
+            <input class="form-control" id="{{ key }}" name="pollOption" placeholder="Poll Option" type="text"
+              value="{{ val.option }}">
+          </div>
+          {% endfor %}
+
+          <button id="addNew" type="button" class="btn btn-primary" onclick="addOption()">Add Another Option</button>
+
+          <div class="poll-options mt-5">
+
+            <h2>Poll Options</h2>
+
+            <label for="end-date" class="form-label mt-4">You can choose to end poll voting on a specific date</label>
+            <div class="input-group mb-3">
+              <input id="end-date" type="text" name="end-date" class="form-control" placeholder="End Date"
+                data-provide="datepicker" value="{{poll['endDate']}}">
+              <span class="input-group-text" id="basic-addon2"><i class="bi bi-calendar-plus"></i></span>
             </div>
 
-            <!-- Poll Options -->
-            {% for key, val in poll['pollQuestions'].items(): %}
-            <div class="mb-3">
-              <label for="exampleFormControlTextarea1" class="form-label">Poll option</label>
-              <input class="form-control" id="pollOption" name="pollOption" placeholder="Poll Option" type="text" value="{{ val.option }}">
-            </div>
-            {% endfor %}
+            <label for="status" class="form-label mt-4">Polls are automatically private which means that people can
+              only vote on a poll that you have shared the link with. Making a poll public means that your poll is
+              visble and searchable by anyone.</label>
+            <select id="status" class="form-select" aria-label="status" name="status">
+              <option {% if poll['public'] %} selected {% endif %}value="True">Public</option>
+              <option {% if not poll['public'] %} selected {% endif %} value="Fales">Private</option>
+            </select>
 
-            <button id="addNew" type="button" class="btn btn-primary" onclick="addOption()">Add Another Option</button>
+          </div>
+          <div class="d-flex justify-content-center mb-5">
+            <button type="submit" class="btn btn-poll w-75 mt-5">Edit Poll</button>
+          </div>
 
-            <div id="poll-options">
-              <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                <label class="form-check-label" for="exampleCheck1">Check me out</label>
-              </div>
-              <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                <label class="form-check-label" for="exampleCheck1">Check me out</label>
-              </div>
-              <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                <label class="form-check-label" for="exampleCheck1">Check me out</label>
-              </div>
-            </div>
-            <button type="submit" class="btn btn-primary w-75">Submit</button>
-          </form>
+        </form>
 
-        </div>
       </div>
     </div>
-  </section>
+  </div>
 </main>
 
 <script>
@@ -57,8 +75,8 @@
     // Create a new element
     var newNode = document.createElement('div');
     newNode.innerHTML = `<div class="mb-3">
-        <label for="exampleFormControlTextarea1" class="form-label">Poll option</label>
-        <input class="form-control" id="pollOption">
+        <label for="pollOption" class="form-label">Poll option</label>
+        <input name="pollOption" class="form-control" id="pollOption">
       </div>`
 
     // Get the reference node

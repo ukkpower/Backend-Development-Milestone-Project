@@ -1,64 +1,158 @@
 {% extends "base.html" %}
 {% block content %}
 
-<main id="main">
-  <section id="results">
+<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+  integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="{{url_for('static', filename='assets/vendor/qrcode/qrcode.js')}}"></script>
 
-    <div class="container">
-      <div class="row justify-content-center align-items-center">
-        <div class="col-md-10">
-          <h2 class="fs-1">Q</h2>
-          <h2>{{ poll.question }}</h2>
-          <div class="row">
-            <div class="col-6">Author</div>
-            <div class="col-6 text-end">Created</div>
-          </div>
-          <div class="row">
-            <div class="col-md-8">
-              {% for key, val in poll['pollQuestions'].items(): %}
-              <div class="card mb-3">
-                <div class="card-body">
-                  <h2 class="card-title">{{ val.option }}</h2>
-                  <p class="percent">{{ val.percent }}%</p>
-                  <div class="progress">
-                    <div class="progress-bar w-{{ val.percent }}" role="progressbar" aria-valuenow="{{ val.percent }}" aria-valuemin="0"
-                      aria-valuemax="100"></div>
+<!-- URL Share Modal -->
+<div class="modal fade" id="url-share" tabindex="-1" aria-labelledby="url-shar" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h2 class="modal-header-title">Share link</h2>
+        <p class="modal-header-subtitle">Copy a link from below to easily share this poll.</p>
+        <label for="copy-results" class="form-label text-muted">Poll link</label>
+        <div class="input-group mb-3">
+          <input id="copy-poll" type="text" class="form-control" placeholder="Recipient's username"
+            value="http://flashpoll.io/poll/{{poll_id}}" readonly>
+          <button onclick="myFunction(this,'copy-poll')" class="btn btn-outline-secondary" type="button">Copy
+            link</button>
+        </div>
+        <label for="copy-results" class="form-label text-muted">Poll results link</label>
+        <div class="input-group">
+          <input id="copy-results" type="text" class="form-control" placeholder="Recipient's username"
+            value="http://flashpoll.io/results/{{poll_id}}" readonly>
+          <button onclick="myFunction(this, 'copy-results')" class="btn btn-outline-secondary" type="button">Copy
+            link</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QR Modal -->
+<div class="modal fade" id="qr-share" tabindex="-1" aria-labelledby="url-shar" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h2 class="modal-header-title">QR Code</h2>
+        <p class="modal-header-subtitle text-muted">You can save the QR code image and share at any event to gather feedback.</p>
+        <div class="qr-container"><div id="qrcode"></div></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  var qrcode = new QRCode(document.getElementById("qrcode"), {
+    text: "http://flashpoll.io/poll/{{poll_id}}",
+    width: 225,
+    height: 225,
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H
+  });
+</script>
+
+<script>
+  function myFunction(objButton, inputID) {
+    var copyText = document.getElementById(inputID);
+    copyText.select();
+    copyText.setSelectionRange(0, 99999)
+    document.execCommand("copy");
+    objButton.innerHTML = "Copied";
+  }
+</script>
+
+<main id="main">
+
+  <div class="container">
+    <div class="row justify-content-center align-items-center">
+      <div class="col-md-10">
+        <h1 class="q mb-3">Q</h1>
+        <h2 class="mb-3">{{ poll.question }}</h2>
+        <p class="credentials">Created by {{ poll.userFullName }}
+          <time datetime="{{ poll.created }}">about {{ poll.timeSince }} ago</time>
+        </p>
+        <div class="row">
+          <div class="col-md-8">
+            {% for key, val in poll['pollQuestions'].items(): %}
+            <div class="card mb-3">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-9">
+                    <h2 class="card-title">{{ val.option }}</h2>
                   </div>
-                  <p class="votes">{{ val.votes }} Votes</p>
+                  <div class="col-3">
+                    <p class="percent">{{ val.percent }}%</p>
+                  </div>
                 </div>
+                <div class="progress mb-4">
+                  <div class="progress-bar w-{{ val.percent }}" role="progressbar" aria-valuenow="{{ val.percent }}"
+                    aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <p class="votes">{{ val.votes }} Votes</p>
               </div>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="col-md-4">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="alert alert-success" role="alert">
+              {% for message in messages %}
+              {{ message }}
               {% endfor %}
             </div>
-            <div class="col-md-4">
-              <button class="btn btn-primary w-100">Submit Vote</button>
+            {% endif %}
+            {% endwith %}
+            <a href="{{url_for('poll', poll_id=poll_id)}}" class="btn btn-primary w-100 mb-4">Submit A Vote</a>
+            <div class="vote-panel mb-5">
               <div class="vote-count">
                 <p>Votes</p>
-                <p>{{ poll.totalVotes }}</p>
+                <p class="fs-1">{{ poll.totalVotes }}</p>
               </div>
               <div class="vote-share">
                 <p class="share-title">Share</p>
                 <ul>
                   <li>
-                    <a href="https://twitter.com/intent/tweet/?text=Which type of movies do you like?%20Vote%20now%20at%20&amp;url=https://fast-poll.com/poll/results/40311c2a"
-                      target="_blank" class="share-link twitter" title="Share on Twitter">Share on Twitter</a>
+                    <a href="https://twitter.com/intent/tweet/?text={{ poll.question }}%20Vote%20now%20at%20&amp;url=http://flashpoll.io/results/{{poll_id}}"
+                      target="_blank" class="share-link twitter" title="Share on Twitter"><i class="bi bi-twitter"></i>
+                      Share on Twitter</a>
                   </li>
 
                   <li>
-                    <a href="https://www.facebook.com/sharer/sharer.php?u=https://fast-poll.com/poll/results/40311c2a"
-                      target="_blank" class="share-link facebook" title="Share on Facebook">Share on Facebook</a>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=http://flashpoll.io/results/{{poll_id}}"
+                      target="_blank" class="share-link facebook" title="Share on Facebook"><i
+                        class="bi bi-facebook"></i> Share on Facebook</a>
                   </li>
 
                   <li>
-                    <a href="https://api.whatsapp.com/send?text=Which type of movies do you like?%20-%20Vote%20now%20at%20https://fast-poll.com/poll/results/40311c2a"
-                      target="_blank" class="share-link whatsapp" title="Share on WhatsApp">Share on WhatsApp</a>
+                    <a href="https://api.whatsapp.com/send?text={{ poll.question }}%20-%20Vote%20now%20at%20http://flashpoll.io/results/{{poll_id}}"
+                      target="_blank" class="share-link whatsapp" title="Share on WhatsApp"><i
+                        class="bi bi-whatsapp"></i> Share on WhatsApp</a>
                   </li>
 
                   <li>
-                    <a href="#" data-reveal-id="copy-url-modal" class="share-link link" title="Share Link">Share
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#url-share" class="share-link link"
+                      title="Share Link"><i class="bi bi-link-45deg"></i> Share
                       Link</a>
                   </li>
                   <li>
-                    <a href="#" class="share-link qr-code" data-reveal-id="qr-code-modal" title="Share QR Code">Share QR
+                    <a href="#" class="share-link qr-code" data-bs-toggle="modal" data-bs-target="#qr-share"
+                      title="Share QR Code"><i class="bi bi-upc-scan"></i> Share QR
                       Code</a>
                   </li>
 
@@ -66,14 +160,14 @@
               </div>
             </div>
           </div>
-
-
-
-
         </div>
+
+
+
+
       </div>
     </div>
-  </section>
+  </div>
 </main>
 
 {% endblock %}

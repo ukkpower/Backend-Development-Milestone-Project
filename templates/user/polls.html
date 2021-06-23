@@ -1,111 +1,9 @@
 {% extends "base-user.html" %}
 {% block content %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-<style>
-  .modal-confirm {
-    color: #636363;
-    width: 400px;
-  }
-
-  .modal-confirm .modal-content {
-    padding: 20px;
-    border-radius: 5px;
-    border: none;
-    text-align: center;
-    font-size: 14px;
-  }
-
-  .modal-confirm .modal-header {
-    border-bottom: none;
-    position: relative;
-  }
-
-  .modal-confirm h4 {
-    text-align: center;
-    font-size: 26px;
-    margin: 30px 0 -10px;
-  }
-
-  .modal-confirm .close {
-    position: absolute;
-    top: -5px;
-    right: -2px;
-  }
-
-  .modal-confirm .modal-body {
-    color: #999;
-  }
-
-  .modal-confirm .modal-footer {
-    border: none;
-    text-align: center;
-    border-radius: 5px;
-    font-size: 13px;
-    padding: 10px 15px 25px;
-  }
-
-  .modal-confirm .modal-footer a {
-    color: #999;
-  }
-
-  .modal-confirm .icon-box {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto;
-    border-radius: 50%;
-    z-index: 9;
-    text-align: center;
-    border: 3px solid #f15e5e;
-  }
-
-  .modal-confirm .icon-box i {
-    color: #f15e5e;
-    font-size: 46px;
-    display: inline-block;
-    margin-top: 13px;
-  }
-
-  .modal-confirm .btn,
-  .modal-confirm .btn:active {
-    color: #fff;
-    border-radius: 4px;
-    background: #60c7c1;
-    text-decoration: none;
-    transition: all 0.4s;
-    line-height: normal;
-    min-width: 120px;
-    border: none;
-    min-height: 40px;
-    border-radius: 3px;
-    margin: 0 5px;
-  }
-
-  .modal-confirm .btn-secondary {
-    background: #c1c1c1;
-  }
-
-  .modal-confirm .btn-secondary:hover,
-  .modal-confirm .btn-secondary:focus {
-    background: #a8a8a8;
-  }
-
-  .modal-confirm .btn-danger {
-    background: #f15e5e;
-  }
-
-  .modal-confirm .btn-danger:hover,
-  .modal-confirm .btn-danger:focus {
-    background: #ee3535;
-  }
-
-  .trigger-btn {
-    display: inline-block;
-    margin: 100px auto;
-  }
-</style>
 
 <!-- Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-confirm">
     <div class="modal-content">
       <div class="modal-header flex-column">
@@ -125,14 +23,15 @@
     </div>
   </div>
 </div>
-<main id="main">
-  <section id="signin">
+<main id="main-user">
 
     <div class="container">
       <div class="row justify-content-center align-items-center">
         <div class="col-md-8">
-          <h2>Dashboard</h2>
-          <p>Below are some stats around your activity.</p>
+          <header class="page-head">
+            <h1 class="page-title">Your Created Polls</h1>
+            <p class="page-subtitle">Below are some stats around your activity.</p>
+          </header>
           {% with messages = get_flashed_messages() %}
           {% if messages %}
           <div class="alert alert-success" role="alert">
@@ -144,15 +43,19 @@
           {% endif %}
           {% endwith %}
 
+          {% if not polls %}
+            no polls
+          {% endif %}
+
           {% for poll in polls %}
-          <div class="card mb-3">
+          <div class="card mb-5">
             <a class="card-body" href="{{url_for('poll', poll_id=poll._id)}}">
               <h2 class="card-title">{{ poll.question }}</h2>
               <p class="date">Created <time class="timeago" datetime="2021-06-03T16:19:24+0000"
-                  title="3rd June 2021">about {{ poll.timeSince }} ago</time></p>
-              <span class="badge rounded-pill bg-success">{{ poll.totalVotes }} Votes</span>
+                  >about {{ poll.timeSince }} ago</time></p>
+              <span class="vote-badge badge rounded-pill bg-success">{{ poll.totalVotes }} Votes</span>
             </a>
-            <div class="editBar" style="position: absolute; bottom: 10; right: 10">
+            <div class="editBar">
               {% if poll.totalVotes == 0 %}
               <a class="btn btn-secondary" href="{{url_for('update', poll_id=poll._id)}}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -188,7 +91,6 @@
       </div>
 
     </div>
-  </section>
 </main>
 
 <script>

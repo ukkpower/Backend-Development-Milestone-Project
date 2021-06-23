@@ -1,33 +1,48 @@
 {% extends "base.html" %}
 {% block content %}
-  
-  <main id="main">
-    <section id="signin">
-      
-  <div class="container">
- <div class="row justify-content-center h-100 align-items-center">
-   <div class="col-md-8">
-    <h2 class="fs-1">Q</h2>
-    <h2>{{ poll.question }}</h2>
-    <p class="date">Created by {{ poll.userFullName }} <time class="timeago" datetime="2021-06-03T16:19:24+0000" title="3rd June 2021">about {{ poll.timeSince }} ago</time></p>
-    <p>Choose one or more options:</p>
-    <form method="POST" action="{{ url_for(request.endpoint, poll_id=poll_id) }}">
-      {% for key, val in poll['pollQuestions'].items(): %}
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="pollOption" value="{{ key }}" id="flexRadioDefault1">
-        <label class="form-check-label" for="flexRadioDefault1">
-          {{ val.option }}
-        </label>
+
+<main id="main">
+
+    <div class="container">
+      <div class="row justify-content-center align-items-center">
+        <div class="col-md-8">
+          {% with messages = get_flashed_messages() %}
+          {% if messages %}
+          <div class="alert alert-success" role="alert">
+            {% for message in messages %}
+            {{ message }}
+            {% endfor %}
+          </div>
+          {% endif %}
+          {% endwith %}          
+          <h1 class="q mb-3">Q</h1>
+          <h2 class="mb-3">{{ poll.question }}</h2>
+          <p class="credentials">Created by {{ poll.userFullName }} 
+            <time datetime="{{ poll.created }}">about {{ poll.timeSince }} ago</time>
+          </p>
+
+          <p class="mt-5">Choose one or more options:</p>
+          <form method="POST" action="{{ url_for(request.endpoint, poll_id=poll_id) }}">
+            {% for key, val in poll['pollQuestions'].items(): %}
+            <div class="form-check mb-4 option-selection">
+              <input class="form-check-input" type="radio" name="pollOption" value="{{ key }}" id="{{key}}">
+              <label class="form-check-label" for="{{key}}">
+                {{ val.option }}
+              </label>
+            </div>
+            {% endfor %}
+
+            <div id="submit-vote" class="d-flex justify-content-center mb-2 mt-5">
+              <button type="submit" class="btn btn-primary w-75">Submit you vote</button>
+            </div>
+            <div id="vote-disclaim" class="d-flex justify-content-center mb-5">
+              <p class="w-100">Remeber you can only vote once, make it count</p>
+            </div>
+          </form>
+
+        </div>
       </div>
-      {% endfor %}
-      
-      <button type="submit" class="btn btn-primary w-75">Submit</button>
-    </form>
-        
-      </div>
-    </div> 
-  </div>
-</section>
+    </div>
 </main>
 
 {% endblock %}
