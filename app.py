@@ -127,19 +127,19 @@ def update(poll_id):
 @app.route("/poll/<poll_id>", methods=["GET", "POST"])
 def poll(poll_id):
     poll = mongo.db.polls.find_one({"_id": ObjectId(poll_id)})
-    # Check to see is the poll open for voting
+    
+    # Check to see if user has already voted
     if not session.get("voted_polls") is None:
         if poll_id in session['voted_polls']:
             flash("You have alread submitted a vote")
             return redirect(url_for("results", poll_id=poll_id))
-
+    
+    # Check to see is the poll open for voting
     if poll['endDate']:
         now = datetime.utcnow()
         if now > poll['endDate']:
             flash("This poll is now closed for voting")
             return redirect(url_for("results", poll_id=poll_id))
-
-    # Check to see if user has already voted
 
     poll['timeSince'] = time_since(poll['created'])
     if request.method == "POST":
@@ -153,6 +153,7 @@ def poll(poll_id):
                     session['voted_polls'] = []
                 session['voted_polls'].append(poll_id)
                 session.modified = True
+                flash("Thank you for your vote")
                 return redirect(url_for("results", poll_id=poll_id))
 
     return render_template("poll.html", poll=poll, type=type(poll), poll_id= ObjectId(poll_id))
