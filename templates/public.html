@@ -12,7 +12,7 @@
         </header>
 
         {% for poll in polls %}
-        <a class="card mb-3" href="{{url_for('poll', poll_id=poll._id)}}">
+        <a class="card mb-5" href="{{url_for('poll', poll_id=poll._id)}}">
           <div class="card-body">
             <h2 class="card-title">{{ poll.question }}</h2>
             <p class="date">Created <time class="timeago" datetime="{{ poll.created }}">about {{ poll.timeSince }}
